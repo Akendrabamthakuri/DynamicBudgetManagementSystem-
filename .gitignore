@@ -1,0 +1,22 @@
+# Eclipse files
+.settings/
+.classpath
+.project
+
+# Build output
+build/
+
+# Old NetBeans desktop app (reference only)
+BudgetManagementSystem /
+
+# Example/reference folder
+main/
+
+# Documentation files
+*.txt
+*.drawio
+*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
