@@ -43,12 +43,7 @@
             </div>
             <div class="form-group">
                 <label>Category</label>
-                <select name="category" required>
-                    <% String[] cats = {"Salary","Food","Rent","Transport","Entertainment","Health","Education","Other"};
-                       for (String cat : cats) { %>
-                        <option value="<%= cat %>" <%= cat.equals(t.getCategory()) ? "selected" : "" %>><%= cat %></option>
-                    <% } %>
-                </select>
+                <input type="text" name="category" required value="<%= t.getCategory() != null ? t.getCategory() : "" %>">
             </div>
             <div class="form-group">
                 <label>Description</label>

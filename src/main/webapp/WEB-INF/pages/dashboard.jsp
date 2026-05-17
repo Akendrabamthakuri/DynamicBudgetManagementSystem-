@@ -43,7 +43,10 @@
     <span class="brand">BudgetTrack</span>
     <div class="nav-links">
         <a href="dashboard">Dashboard</a>
+        <a href="budgetGoals">Budget Goals</a>
         <a href="profile">Profile</a>
+        <a href="about">About</a>
+        <a href="contact">Contact</a>
         <a href="logout">Logout</a>
     </div>
 </nav>

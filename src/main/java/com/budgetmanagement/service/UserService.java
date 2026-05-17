@@ -35,9 +35,54 @@ public class UserService {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                int userId = rs.getInt("id");
                 String storedPassword = rs.getString("password");
+                int failedAttempts = rs.getInt("failed_attempts");
+                boolean isLocked = rs.getBoolean("is_locked");
+                Timestamp lockUntil = rs.getTimestamp("lock_until");
+
+                // If account is locked and lock period not expired, deny login
+                if (isLocked && lockUntil != null && lockUntil.after(new Timestamp(System.currentTimeMillis()))) {
+                    return null; // account still locked
+                }
+
+                // If lock period expired, reset lock fields
+                if (isLocked && (lockUntil == null || !lockUntil.after(new Timestamp(System.currentTimeMillis())))) {
+                    String resetQuery = "UPDATE users SET failed_attempts = 0, is_locked = FALSE, lock_until = NULL WHERE id = ?";
+                    try (PreparedStatement resetPs = conn.prepareStatement(resetQuery)) {
+                        resetPs.setInt(1, userId);
+                        resetPs.executeUpdate();
+                    }
+                }
+
                 if (storedPassword.equals(password)) {
+                    // Successful login: reset attempts
+                    String resetQuery = "UPDATE users SET failed_attempts = 0, is_locked = FALSE, lock_until = NULL WHERE id = ?";
+                    try (PreparedStatement resetPs = conn.prepareStatement(resetQuery)) {
+                        resetPs.setInt(1, userId);
+                        resetPs.executeUpdate();
+                    }
                     return mapUser(rs);
+                } else {
+                    // Wrong password: increment failed attempts
+                    failedAttempts = failedAttempts + 1;
+                    if (failedAttempts >= 5) {
+                        String lockQuery = "UPDATE users SET failed_attempts = ?, is_locked = TRUE, lock_until = ? WHERE id = ?";
+                        try (PreparedStatement lockPs = conn.prepareStatement(lockQuery)) {
+                            lockPs.setInt(1, failedAttempts);
+                            Timestamp until = new Timestamp(System.currentTimeMillis() + 3 * 60 * 1000); // 3 minutes
+                            lockPs.setTimestamp(2, until);
+                            lockPs.setInt(3, userId);
+                            lockPs.executeUpdate();
+                        }
+                    } else {
+                        String incQuery = "UPDATE users SET failed_attempts = ? WHERE id = ?";
+                        try (PreparedStatement incPs = conn.prepareStatement(incQuery)) {
+                            incPs.setInt(1, failedAttempts);
+                            incPs.setInt(2, userId);
+                            incPs.executeUpdate();
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -138,6 +183,20 @@ public class UserService {
             if (rs.next()) return mapUser(rs);
         } catch (SQLException e) {
             System.err.println("Get user error: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // Get lock_until timestamp for an email (used to inform user about lockout)
+    public Timestamp getLockUntilByEmail(String email) {
+        String query = "SELECT lock_until FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getTimestamp("lock_until");
+        } catch (SQLException e) {
+            System.err.println("Get lock_until error: " + e.getMessage());
         }
         return null;
     }

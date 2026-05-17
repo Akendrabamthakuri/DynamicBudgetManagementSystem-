@@ -40,19 +40,25 @@ public class TransactionController extends HttpServlet {
 
         String type = request.getParameter("type");
         String amountStr = request.getParameter("amount");
-        String category = request.getParameter("category");
+        String categoryStr = request.getParameter("category");
         String description = request.getParameter("description");
         String date = request.getParameter("transactionDate");
 
         if (ValidationUtil.isNullOrEmpty(type) || !ValidationUtil.isValidAmount(amountStr)
-                || ValidationUtil.isNullOrEmpty(category) || ValidationUtil.isNullOrEmpty(date)) {
+            || ValidationUtil.isNullOrEmpty(categoryStr) || ValidationUtil.isNullOrEmpty(date)) {
             request.setAttribute("error", "Please fill all required fields with valid values.");
             String page = "edit".equals(action) ? "/WEB-INF/pages/editTransaction.jsp" : "/WEB-INF/pages/addTransaction.jsp";
             request.getRequestDispatcher(page).forward(request, response);
             return;
         }
 
-        Transaction t = new Transaction(user.getId(), type, Double.parseDouble(amountStr), category, description, date);
+        Transaction t = new Transaction();
+        t.setUserId(user.getId());
+        t.setType(type);
+        t.setAmount(Double.parseDouble(amountStr));
+        t.setCategory(categoryStr);
+        t.setDescription(description);
+        t.setTransactionDate(date);
 
         if ("edit".equals(action)) {
             t.setId(Integer.parseInt(request.getParameter("id")));

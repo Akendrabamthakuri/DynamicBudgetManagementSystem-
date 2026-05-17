@@ -67,6 +67,39 @@
         <servlet-name>AdminController</servlet-name>
         <url-pattern>/adminTransactions</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminController</servlet-name>
+        <url-pattern>/adminMessages</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AboutController</servlet-name>
+        <servlet-class>com.budgetmanagement.controllers.AboutController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AboutController</servlet-name>
+        <url-pattern>/about</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ContactController</servlet-name>
+        <servlet-class>com.budgetmanagement.controllers.ContactController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ContactController</servlet-name>
+        <url-pattern>/contact</url-pattern>
+    </servlet-mapping>
+
+    <!-- CategoryController removed -->
+
+    <servlet>
+        <servlet-name>BudgetGoalController</servlet-name>
+        <servlet-class>com.budgetmanagement.controllers.BudgetGoalController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BudgetGoalController</servlet-name>
+        <url-pattern>/budgetGoals</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>ForgotPasswordController</servlet-name>
@@ -114,6 +147,16 @@
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/adminTransactions</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/budgetGoals</url-pattern>
+    </filter-mapping>
+    <!-- adminCategories filter-mapping removed -->
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/adminMessages</url-pattern>
     </filter-mapping>
 
     <!-- Welcome page -->

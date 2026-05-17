@@ -25,7 +25,7 @@
     <h2>Manage Users</h2>
     <table class="data-table">
         <thead>
-            <tr><th>ID</th><th>Name</th><th>Email</th><th>Budget Limit</th><th>Status</th><th>Actions</th></tr>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Budget Limit</th><th>Actions</th></tr>
         </thead>
         <tbody>
         <% if (users != null) { for (User u : users) { %>

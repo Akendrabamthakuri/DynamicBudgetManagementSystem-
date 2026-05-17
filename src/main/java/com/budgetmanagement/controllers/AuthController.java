@@ -2,6 +2,7 @@ package com.budgetmanagement.controllers;
 
 import com.budgetmanagement.model.User;
 import com.budgetmanagement.service.UserService;
+import com.budgetmanagement.service.AuditLogService;
 import com.budgetmanagement.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
@@ -13,6 +14,8 @@ import java.io.IOException;
  */
 public class AuthController extends HttpServlet {
     private final UserService userService = new UserService();
+    private final AuditLogService auditLogService = new AuditLogService();
+    
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,10 +53,22 @@ public class AuthController extends HttpServlet {
             return;
         }
 
+        // Check lock status first
+        java.sql.Timestamp lockUntil = userService.getLockUntilByEmail(email);
+        if (lockUntil != null && lockUntil.after(new java.sql.Timestamp(System.currentTimeMillis()))) {
+            long remainingMs = lockUntil.getTime() - System.currentTimeMillis();
+            long remainingSec = remainingMs / 1000;
+            long remainingMin = remainingSec / 60;
+            request.setAttribute("error", "Account locked. Try again in " + remainingMin + " minute(s).");
+            request.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(request, response);
+            return;
+        }
+
         User user = userService.loginUser(email, password);
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
+            auditLogService.log(user.getId(), user.getUsername(), "LOGIN", "User logged in successfully", request.getRemoteAddr());
             // Redirect based on role
             if ("admin".equals(user.getRole())) {
                 response.sendRedirect("adminDashboard");
@@ -111,7 +126,13 @@ public class AuthController extends HttpServlet {
 
     private void handleLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
-        if (session != null) session.invalidate();
+        if (session != null) {
+            User user = (User) session.getAttribute("user");
+            if (user != null) {
+                auditLogService.log(user.getId(), user.getUsername(), "LOGOUT", "User logged out", request.getRemoteAddr());
+            }
+            session.invalidate();
+        }
         response.sendRedirect("login");
     }
 }

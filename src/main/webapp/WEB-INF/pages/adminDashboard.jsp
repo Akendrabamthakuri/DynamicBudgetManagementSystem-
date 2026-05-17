@@ -46,7 +46,7 @@
 
     <table class="data-table">
         <thead>
-            <tr><th>ID</th><th>Name</th><th>Email</th><th>Budget Limit</th><th>Status</th></tr>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Budget Limit</th></tr>
         </thead>
         <tbody>
         <% if (users != null) { for (User u : users) { %>

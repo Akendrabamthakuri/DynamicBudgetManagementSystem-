@@ -33,7 +33,7 @@ public class TransactionService {
     // Get all transactions for a specific user
     public List<Transaction> getUserTransactions(int userId) {
         List<Transaction> list = new ArrayList<>();
-        String query = "SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC";
+        String query = "SELECT t.* FROM transactions t WHERE t.user_id = ? ORDER BY t.transaction_date DESC";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, userId);
@@ -48,7 +48,7 @@ public class TransactionService {
     // Get all transactions (admin use)
     public List<Transaction> getAllTransactions() {
         List<Transaction> list = new ArrayList<>();
-        String query = "SELECT * FROM transactions ORDER BY transaction_date DESC";
+        String query = "SELECT t.* FROM transactions t ORDER BY t.transaction_date DESC";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
@@ -116,7 +116,7 @@ public class TransactionService {
     public List<Transaction> getUserTransactionsByPeriod(int userId, String period) {
         List<Transaction> list = new ArrayList<>();
         String dateFilter = getDateFilter(period);
-        String query = "SELECT * FROM transactions WHERE user_id = ?" + dateFilter + " ORDER BY transaction_date DESC";
+        String query = "SELECT t.* FROM transactions t WHERE t.user_id = ?" + dateFilter + " ORDER BY t.transaction_date DESC";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, userId);
@@ -155,7 +155,7 @@ public class TransactionService {
 
     // Get a single transaction by id
     public Transaction getTransactionById(int id) {
-        String query = "SELECT * FROM transactions WHERE id = ?";
+        String query = "SELECT t.* FROM transactions t WHERE t.id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -173,7 +173,7 @@ public class TransactionService {
         t.setUserId(rs.getInt("user_id"));
         t.setType(rs.getString("type"));
         t.setAmount(rs.getDouble("amount"));
-        t.setCategory(rs.getString("category"));
+        try { t.setCategory(rs.getString("category")); } catch(Exception ignored) {}
         t.setDescription(rs.getString("description"));
         t.setTransactionDate(rs.getString("transaction_date"));
         return t;

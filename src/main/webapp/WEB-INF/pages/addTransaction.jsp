@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,17 +42,7 @@
             </div>
             <div class="form-group">
                 <label>Category</label>
-                <select name="category" required>
-                    <option value="">Select category</option>
-                    <option value="Salary">Salary</option>
-                    <option value="Food">Food</option>
-                    <option value="Rent">Rent</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Health">Health</option>
-                    <option value="Education">Education</option>
-                    <option value="Other">Other</option>
-                </select>
+                <input type="text" name="category" required placeholder="Enter category name">
             </div>
             <div class="form-group">
                 <label>Description</label>
